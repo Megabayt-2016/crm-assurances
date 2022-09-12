@@ -1,0 +1,89 @@
+
+
+
+
+
+.container-fluid{
+    display: grid;
+    height: 50%;
+    place-items: center;
+    text-align: center;
+    margin-top: 10%;
+}
+
+.container-fluid .wraper{
+    position: relative;
+    height: 300px;
+    width: 70%;
+    border-radius: 10px;
+    background-color: #ffffff;
+    border: 1px dashed rgb(2, 129, 2) ;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.wraper .image{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.wraper .image img{
+       height: 100%;
+       width: 100%;
+       object-fit: cover;
+}
+.wraper .icon{
+    font-size: 100px;
+    color: rgb(2, 129, 2);
+
+}
+.wraper .text{
+    font-size: 20px;
+    font-weight: 500;
+    color: black;
+    
+}
+.wraper #cancel-btn {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: rgb(2, 129, 2);
+    display: none;
+}
+
+.wraper.active:hover #cancel-btn {
+    display: block;
+}
+
+.wraper .file-name {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    color: black;
+    padding: 8px 0;
+    font-size: 18px;
+    background: white;
+
+}
+.container-fluid #custom-btn{
+    margin-top: 30px;
+    width: 50%;
+    height: 50px;
+    display: block;
+    border: none;
+    outline: none;
+    border-radius: 25px;
+    color: #fff;
+    background-color: rgb(2, 129, 2) ;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+
+}
