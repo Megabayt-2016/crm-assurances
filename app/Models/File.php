@@ -10,7 +10,7 @@ class File extends Model
     use HasFactory;
     protected $fillable = [
         'situation',
-        'assurancePersonne_id',
+        'assurance_id',
         'permis_conduire_name',
         'permis_conduire_path',
         'carte_grise_name',

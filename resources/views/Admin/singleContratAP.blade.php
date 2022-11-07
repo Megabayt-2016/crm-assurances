@@ -34,7 +34,7 @@
          <nav>
             <ul>
                <li>
-                  <b>Votre contrat d'{{$contrat->AssurancePersonne->type}}</b>
+                  <b>Votre contrat d'{{$contrat->projet->typeassurance->nom}}</b>
                </li>
                <li>
                   Contrat N° : <b>{{$contrat->N_Contrat}}</b>

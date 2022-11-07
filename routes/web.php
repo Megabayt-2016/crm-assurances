@@ -44,7 +44,7 @@ Route::post('/uploadingvtc', [\App\Http\Controllers\FilesController::class, 'sto
 
 Route::get('/uploaded', [\App\Http\Controllers\FilesController::class, 'uploaded'])->name('uploaded');
 
-Route::get('/show', [\App\Http\Controllers\FilesController::class, 'show'])->middleware('auth')->name('show');
+Route::get('/dossiers', [\App\Http\Controllers\FilesController::class, 'show'])->middleware('auth')->name('show');
 
 Route::get('/details/{client_id}/{folder_id}', function ($client_id, $folder_id) {
     return view('Form/details', ['guest' => \App\Models\Client::find($client_id),
@@ -79,7 +79,7 @@ Route::get('/' , function () {
         } elseif (auth()->user()->estGestionnaire()){
             return redirect('/Gestionnaire/index');
         } elseif (auth()->user()->estAdmin()){
-            return redirect('/Admin/index');
+            return redirect('/dashboard');
         }
     }  else {
         return view('/auth/login');
@@ -223,12 +223,13 @@ Route::post('/Gestionnaire/telechargerFactureE', [App\Http\Controllers\Gestionna
 
 
 /*Les pages du Admin */
-Route::get('/Admin/index', [App\Http\Controllers\AdminController::class, 'index'])->middleware(['auth', 'admin']);
+Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'index'])->middleware(['auth', 'admin']);
 
-Route::get('/Admin/ajouter', [App\Http\Controllers\AdminController::class, 'ajouter'])->middleware(['auth', 'admin']);
-Route::post('/Admin/ajouter', [App\Http\Controllers\AdminController::class, 'storeClient'])->middleware(['auth', 'admin']);
+Route::get('/clients/ajouter', [App\Http\Controllers\AdminController::class, 'ajouterClient'])->middleware(['auth', 'admin']);
+Route::post('/clients/ajouter', [App\Http\Controllers\AdminController::class, 'storeClient'])->middleware(['auth', 'admin']);
+Route::get('/clients/profile/{id}', [App\Http\Controllers\AdminController::class, 'profileClient'])->middleware(['auth', 'admin']);
 
-Route::get('/Admin/listeClients', [App\Http\Controllers\AdminController::class, 'listeClients'])->middleware(['auth', 'admin']);
+Route::get('/clients', [App\Http\Controllers\AdminController::class, 'listeClients'])->middleware(['auth', 'admin']);
 Route::delete('/Admin/listeClients/{id}', [App\Http\Controllers\AdminController::class, 'deleteClient'])->middleware(['auth', 'admin']);
 Route::get('/Admin/edit/editClient/{id}', [App\Http\Controllers\AdminController::class, 'editClient'])->middleware(['auth', 'admin']);
 Route::put('/Admin/edit/editClient/{id}', [App\Http\Controllers\AdminController::class, 'updateClient'])->middleware(['auth', 'admin']);
@@ -243,8 +244,9 @@ Route::post('/Admin/ajouterAgent', [App\Http\Controllers\AdminController::class,
 Route::get('/Admin/ajouterGestionnaire', [App\Http\Controllers\AdminController::class, 'ajouterGestionnaire'])->middleware(['auth', 'admin']);
 Route::post('/Admin/ajouterGestionnaire', [App\Http\Controllers\AdminController::class, 'storeGestionnaire'])->middleware(['auth', 'admin']);
 
-Route::get('/Admin/assurancePersonne', [App\Http\Controllers\AdminController::class, 'assurancePersonne'])->middleware(['auth', 'admin']);
-Route::post('/Admin/assurancePersonne', [App\Http\Controllers\AdminController::class, 'storeAssuranceP'])->middleware(['auth', 'admin']);
+Route::get('/projets/ajouter', [App\Http\Controllers\AdminController::class, 'pickclient'])->middleware(['auth', 'admin'])->name('addprojet');
+Route::get('/projets/ajouter/{client_id}', [App\Http\Controllers\AdminController::class, 'addprojet'])->middleware(['auth', 'admin'])->name('addprojet');
+Route::post('/projets/ajouter', [App\Http\Controllers\AdminController::class, 'storeprojet'])->middleware(['auth', 'admin']);
 
 Route::get('/Admin/assuranceAnimaux', [App\Http\Controllers\AdminController::class, 'assuranceAnimaux'])->middleware(['auth', 'admin']);
 Route::post('/Admin/assuranceAnimaux', [App\Http\Controllers\AdminController::class, 'storeAssuranceA'])->middleware(['auth', 'admin']);
@@ -267,9 +269,9 @@ Route::delete('/Admin/listeContratAA/{id}', [App\Http\Controllers\AdminControlle
 Route::get('Admin//singleContratAA/{id}', [App\Http\Controllers\AdminController::class, 'singleContratAA'])->middleware(['auth', 'admin']);
 Route::post('/Admin/telechargerContratAA', [App\Http\Controllers\AdminController::class, 'telechargerContratAA'])->middleware(['auth', 'admin']);
 
-Route::get('/Admin/listeContratAP', [App\Http\Controllers\AdminController::class, 'listeContratAP'])->middleware(['auth', 'admin']);
+Route::get('/Admin/listeContrat', [App\Http\Controllers\AdminController::class, 'listeContrat'])->middleware(['auth', 'admin']);
 Route::delete('/Admin/listeContratAP/{id}', [App\Http\Controllers\AdminController::class, 'deleteContratAP'])->middleware(['auth', 'admin']);
-Route::get('Admin//singleContratAP/{id}', [App\Http\Controllers\AdminController::class, 'singleContratAP'])->middleware(['auth', 'admin']);
+Route::get('Admin/singleContrat/{id}', [App\Http\Controllers\AdminController::class, 'singleContrat'])->middleware(['auth', 'admin']);
 Route::post('/Admin/telechargerContratAP', [App\Http\Controllers\AdminController::class, 'telechargerContratAP'])->middleware(['auth', 'admin']);
 
 Route::get('/Admin/listeContratE', [App\Http\Controllers\AdminController::class, 'listeContratE'])->middleware(['auth', 'admin']);
@@ -292,8 +294,8 @@ Route::delete('/Admin/listeGestionnaire/{id}', [App\Http\Controllers\AdminContro
 Route::get('Admin/edit/editGestionnaire/{id}', [App\Http\Controllers\AdminController::class, 'editGestionnaire'])->middleware(['auth', 'admin']);
 Route::put('Admin/edit/editGestionnaire/{id}', [App\Http\Controllers\AdminController::class, 'updateGestionnaire'])->middleware(['auth', 'admin']);
 
-Route::get('/Admin/listeProjetAP', [App\Http\Controllers\AdminController::class, 'listeProjetAP'])->middleware(['auth', 'admin']);
-Route::delete('/Admin/listeProjetAP/{id}', [App\Http\Controllers\AdminController::class, 'deleteProjetAP'])->middleware(['auth', 'admin']);
+Route::get('/projets', [App\Http\Controllers\AdminController::class, 'listeProjet'])->middleware(['auth', 'admin']);
+Route::delete('/projects/{id}', [App\Http\Controllers\AdminController::class, 'deleteProjetAP'])->middleware(['auth', 'admin']);
 Route::get('/Admin/edit/editProjetAP/{id}', [App\Http\Controllers\AdminController::class, 'editProjetAP'])->middleware(['auth', 'admin']);
 Route::put('/Admin/edit/editProjetAP/{id}', [App\Http\Controllers\AdminController::class, 'updateProjetAP'])->middleware(['auth', 'admin']);
 
@@ -313,24 +315,11 @@ Route::get('/Admin/importer', [App\Http\Controllers\ImportController::class, 'sh
 Route::post('/Admin/importer', [App\Http\Controllers\ImportController::class, 'store'])->middleware(['auth', 'admin']);
 
 //pour la facture
-Route::get('/Admin/factureAP', [App\Http\Controllers\AdminController::class, 'factureAP'])->middleware(['auth', 'admin']);
-Route::post('/Admin/factureAP', [App\Http\Controllers\AdminController::class, 'storeFactureAP'])->middleware(['auth', 'admin']);
-
-Route::get('/Admin/factureAA', [App\Http\Controllers\AdminController::class, 'factureAA'])->middleware(['auth', 'admin']);
-Route::post('/Admin/factureAA', [App\Http\Controllers\AdminController::class, 'storeFactureAA'])->middleware(['auth', 'admin']);
-
-Route::get('/Admin/factureE', [App\Http\Controllers\AdminController::class, 'factureE'])->middleware(['auth', 'admin']);
-Route::post('/Admin/factureE', [App\Http\Controllers\AdminController::class, 'storeFactureE'])->middleware(['auth', 'admin']);
-
-Route::get('/Admin/singleFactureAP/{id}', [App\Http\Controllers\AdminController::class, 'singleFactureAP'])->middleware(['auth', 'admin']);
-Route::get('/Admin/singleFactureAA/{id}', [App\Http\Controllers\AdminController::class, 'singleFactureAA'])->middleware(['auth', 'admin']);
-Route::get('/Admin/singleFactureE/{id}', [App\Http\Controllers\AdminController::class, 'singleFactureE'])->middleware(['auth', 'admin']);
-
-
-Route::post('/Admin/telechargerFactureAP', [App\Http\Controllers\AdminController::class, 'telechargerFactureAP'])->middleware(['auth', 'admin']);
-Route::post('/Admin/telechargerFactureAA', [App\Http\Controllers\AdminController::class, 'telechargerFactureAA'])->middleware(['auth', 'admin']);
-Route::post('/Admin/telechargerFactureE', [App\Http\Controllers\AdminController::class, 'telechargerFactureE'])->middleware(['auth', 'admin']);
-
+Route::get('/Admin/factures', [App\Http\Controllers\AdminController::class, 'factures'])->middleware(['auth', 'admin']);
+Route::post('/Admin/factures', [App\Http\Controllers\AdminController::class, 'storeFactures'])->middleware(['auth', 'admin']);
+Route::delete('/Admin/deletefacture/{id}', [App\Http\Controllers\AdminController::class, 'deletefacture'])->middleware(['auth', 'admin']);
+Route::get('/Admin/singleFacture/{id}', [App\Http\Controllers\AdminController::class, 'singleFacture'])->middleware(['auth', 'admin']);
+Route::post('/Admin/telechargerFacture', [App\Http\Controllers\AdminController::class, 'telechargerFacture'])->middleware(['auth', 'admin']);
 
 //logout:
 Route::post('/logout', [App\Http\Controllers\Auth\LogoutController::class, 'logout'])->name('logout');

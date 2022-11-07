@@ -14,7 +14,7 @@
 					<div class="main-menu-header">
 						<img class="img-radius" src="{{ url('../img/undraw_profile.svg')}}" alt="User-Profile-Image">
 						<div class="user-details">
-							<div id="more-details">{{auth()->user()->nom}} {{auth()->user()->prenom}}<i class="fa fa-caret-down"></i><br><span>{{auth()->user()->role}}</span></div>
+							<div id="more-details">{{auth()->user()->nom}} {{auth()->user()->prenom}}<i class="fa fa-caret-down"></i><br><span>{{auth()->user()->roleuser->nom}}</span></div>
 						</div>
 					</div>
 					<div class="collapse" id="nav-user-link">
@@ -36,59 +36,42 @@
 					    <label>{{ __("vue d'ensemble")}}</label>
 					</li>
 					<li class="nav-item">
-					    <a href="{{url('/Admin/index')}}" class="nav-link "><span class="pcoded-micon"><i class="fa fa-home"></i></span><span class="pcoded-mtext">{{ __('tableau de bord ')}}</span></a>
+					    <a href="{{url('/dashboard')}}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">{{ __('tableau de bord ')}}</span></a>
 					</li>
 					<li class="nav-item">
-					    <a href="{{url('/Admin/calendrier')}}" class="nav-link "><span class="pcoded-micon"><i class="fa fa-calendar"></i></span><span class="pcoded-mtext">{{ __('Calendrier')}}</span></a>
+					    <a href="{{url('/clients')}}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-users" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Liste les clients')}}</span></a>
 					</li>
+					<li class="nav-item">
+					    <a href="{{url('/dossiers')}}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-plus"></i></span><span class="pcoded-mtext">{{ __('Les Dossier')}}</span></a>
+					</li>
+					
 
 					<li class="nav-item pcoded-menu-caption">
 					    <label>{{ __('Projets')}}</label>
 					</li>
-                    <li class="nav-item pcoded-hasmenu">
-					    <a href="#" class="nav-link "><span class="pcoded-micon"><i class="fa fa-eye" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Tous Projets')}}</span></a>
-					    <ul class="pcoded-submenu">
-					        <li><a href="{{url('/Admin/listeProjetAP')}}">{{ __('Assurance Personnes')}}</a></li>
-					        <li><a href="{{url('/Admin/listeProjetAA')}}">{{ __('Assurance Animaux')}}</a></li>
-					        <li><a href="{{url('/Admin/emprunteur')}}">{{ __('Emprunteurs')}}</a></li>
-					    </ul>
+                    <li class="nav-item">
+					    <a href="{{url('/projets')}}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-briefcase" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Tous Projets')}}</span></a>
 					</li>
+					<li class="nav-item">
+					    <a href="{{url('/Admin/listeContrat')}}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Nos Contrats')}}</span></a>
+					</li>
+					<li class="nav-item">
+					    <a href="{{url('/Admin/factures')}}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-book" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Nos Factures')}}</span></a>
+					</li>
+
 					<li class="nav-item pcoded-hasmenu">
 					    <a href="#" class="nav-link "><span class="pcoded-micon"><i class="fa fa-plus" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Nouveau Projet')}}</span></a>
 					    <ul class="pcoded-submenu">
-					        <li><a href="{{url('/Admin/assurancePersonne')}}">{{ __('Assurance Personnes')}}</a></li>
+					        <li><a href="{{url('/projets/ajouter')}}">{{ __('Assurance Personnes')}}</a></li>
 					        <li><a href="{{url('/Admin/assuranceAnimaux')}}">{{ __('Assurance Animaux')}}</a></li>
 					        <li><a href="{{url('/Admin/emprunteur')}}">{{ __('Emprunteurs')}}</a></li>
 					    </ul>
 					</li>
-					<li class="nav-item pcoded-hasmenu">
-					    <a href="#" class="nav-link "><span class="pcoded-micon"><i class="fa fa-plus" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Nos Contrats')}}</span></a>
-					    <ul class="pcoded-submenu">
-					        <li><a href="{{url('/Admin/listeContratAP')}}">{{ __('Assurance Personnes')}}</a></li>
-					        <li><a href="{{url('/Admin/listeContratAA')}}">{{ __('Assurance Animaux')}}</a></li>
-					        <li><a href="{{url('/Admin/listeContratE')}}">{{ __('Emprunteurs')}}</a></li>
-					    </ul>
-					</li>
-					<li class="nav-item pcoded-hasmenu">
-					    <a href="#" class="nav-link "><span class="pcoded-micon"><i class="fa fa-plus" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Nos Factures')}}</span></a>
-					    <ul class="pcoded-submenu">
-					        <li><a href="{{url('/Admin/factureAP')}}">{{ __('Assurance Personnes')}}</a></li>
-					        <li><a href="{{url('/Admin/factureAA')}}">{{ __('Assurance Animaux')}}</a></li>
-					        <li><a href="{{url('/Admin/factureE')}}">{{ __('Emprunteurs')}}</a></li>
-					    </ul>
-					</li>
+
 					<li class="nav-item pcoded-menu-caption">
 					    <label>{{ __('Nos Clients')}}</label>
 					</li>
-					<li class="nav-item">
-					    <a href="{{url('/Admin/listeClients')}}" class="nav-link "><span class="pcoded-micon"><i class="fa fa-plus" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Lister les clients')}}</span></a>
-					</li>
-					<li class="nav-item">
-					    <a href="{{url('/Admin/ajouter')}}" class="nav-link "><span class="pcoded-micon"><i class="fa fa-list" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Ajouter des clients')}}</span></a>
-					</li>
-					<li class="nav-item">
-					    <a href="{{url('/Admin/importer')}}" class="nav-link "><span class="pcoded-micon"><i class="fa fa-list" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Importer des clients')}}</span></a>
-					</li>
+					
 					<li class="nav-item">
 					    <a href="{{url('/Admin/contacterClients')}}" class="nav-link "><span class="pcoded-micon"><i class="fa fa-list" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Contacter les Clients')}}</span></a>
 					</li>
@@ -109,6 +92,9 @@
 					</li>
 					<li class="nav-item">
 					    <a href="{{url('/Admin/listeGestionnaire')}}" class="nav-link "><span class="pcoded-micon"><i class="fa fa-list" aria-hidden="true"></i></span><span class="pcoded-mtext">{{ __('Lister Gestionnaires')}}</span></a>
+					</li>
+					<li class="nav-item">
+					    <a href="{{url('/Admin/calendrier')}}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-calendar"></i></span><span class="pcoded-mtext">{{ __('Calendrier')}}</span></a>
 					</li>
 					
 				</ul>

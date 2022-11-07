@@ -37,6 +37,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function roleuser(){
+        return $this->belongsTo(RoleUser::class, 'id');
+    }
+
     /**
      * The attributes that should be cast.
      *
@@ -47,14 +51,14 @@ class User extends Authenticatable
     ];
 
     public function estAgent(){
-        return auth()->user()->role == 'Agent';
+        return auth()->user()->role == '3';
     }
 
     public function estGestionnaire(){
-        return auth()->user()->role == 'Gestionnaire';
+        return auth()->user()->role == '2';
     }
 
     public function estAdmin(){
-        return auth()->user()->role == 'Admin';
+        return auth()->user()->role == '1';
     }
 }

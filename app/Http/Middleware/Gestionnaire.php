@@ -17,7 +17,7 @@ class Gestionnaire
      */
     public function handle(Request $request, Closure $next)
     {
-        if(auth()->user()->role == 'Gestionnaire'){
+        if(auth()->user()->role == '2'){
             return $next($request);
           }
             return redirect('login')->with('error','Vous êtes pas autentifié');

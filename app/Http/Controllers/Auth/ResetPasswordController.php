@@ -36,7 +36,7 @@ class ResetPasswordController extends Controller
                 return "/Gestionnaire/index";
             break;
             case 'Admin':
-                return "/Admin/index";
+                return "/dashboard";
                 break;
                 
             default:

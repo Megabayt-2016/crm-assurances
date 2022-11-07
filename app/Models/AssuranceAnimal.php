@@ -9,19 +9,19 @@ class AssuranceAnimal extends Model
 {
     use HasFactory;
 
-    public function client () {
+    public function client() {
         return $this->belongsTo(Client::class);
     }
 
-    public function user () {
+    public function user() {
         return $this->belongsTo(User::class);
     }
 
-    public function AssureA () {
+    public function AssureA() {
         return $this->hasMany(AssureAnimal::class);
     }
 
-    public function contratAA () {
+    public function contratAA() {
         return $this->hasMany(ContratAnimal::class);
     }
 }

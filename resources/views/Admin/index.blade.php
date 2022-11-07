@@ -10,7 +10,7 @@
                 <div class="alert alert-success">
                     <strong> {{ session('status') }}</strong>
                 </div>
-                <br />
+                <br/>
             @endif
             <!-- [ breadcrumb ] start -->
             <div class="page-header">
@@ -87,7 +87,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="col-lg-4 col-md-12">
@@ -104,11 +103,11 @@
                                 <div class="card-footer bg-primary text-white">
                                     <div class="row text-center">
                                         <div class="col">
-                                            <h4 class="m-0 text-white">!!</h4>
+                                            <h4 class="m-0 text-white">{{$projects->count()}}</h4>
                                             <span>Projects</span>
                                         </div>
                                         <div class="col">
-                                            <h4 class="m-0 text-white">{{$contrats->contrat_personnes + $contrats->contrat_animals + $contrats->contrat_emprunteurs }}</h4>
+                                            <h4 class="m-0 text-white">{{$contrats->contrats }}</h4>
                                             <span>Contrats</span>
                                         </div>
                                         <div class="col">

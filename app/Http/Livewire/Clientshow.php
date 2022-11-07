@@ -3,11 +3,9 @@
 namespace App\Http\Livewire;
 
 use File;
-use App\Models\Folder;
 use App\Models\Client;
 use App\Models\Status;
 use App\Models\Situation;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -76,7 +74,7 @@ class Clientshow extends Component
         }
 
         return view('livewire.clientshow', [
-            "guests" => $guestQuery->latest()->paginate(4),
+            "guests" => $guestQuery->latest()->paginate(15),
             "status" => Status::all(),
             "situations" => Situation::all(),
         ]);

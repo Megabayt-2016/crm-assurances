@@ -28,8 +28,13 @@ class Client extends Model
     }
 
     public function folder(){
-        return $this->hasMany(Folder::class, 'client_id');
+        return $this->hasMany(Folder::class);
     }
+
+    public function project(){
+        return $this->hasMany(Assurances::class, 'client_id');
+    }
+
 
 }
 

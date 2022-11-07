@@ -15,7 +15,7 @@ class CreateAssurePersonnesTable extends Migration
     {
         Schema::create('assure_personnes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('assurancePersonne_id')
+            $table->foreignId('assurance_id')
                   ->constrained()
                   ->onUpdate('cascade')
                   ->onDelete('cascade');

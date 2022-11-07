@@ -3,10 +3,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Folder;
 use App\Models\ContratAnimal;
-use App\Models\ContratPersonne;
+use App\Models\Contrats;
 use App\Models\ContratEmprunteur;
 use App\Models\AssuranceAnimal;
-use App\Models\AssurancePersonne;
+use App\Models\Assurances;
+use App\Models\AssurancesType;
 use App\Models\Emprunteur;
 use App\Models\AssurePersonne;
 use App\Models\AssureAnimal;
@@ -14,12 +15,14 @@ use App\Models\Notif;
 use App\Models\Calendrier;
 use App\Models\Facture;
 use App\Models\FactureAnimal;
-use App\Models\FacturePersonne;
+use App\Models\Factures;
 use App\Models\FactureEmprunteur;
 use App\Models\Client;
 use Carbon\Carbon;
 use App\Models\File;
+use App\Models\Situation;
 use Illuminate\Support\Facades\DB;
+
 
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\EmailNotification;
@@ -47,6 +50,7 @@ class AdminController extends Controller
         $gest = User::all()->where('role', 'Gestionnaire')->count();
         $agent = User::all()->where('role', 'Agent')->count();
         $client = Client::all()->count();
+        $projects = Assurances::all();
         $clientweek = Client::where('created_at', '>', Carbon::now()->startOfWeek())->where('created_at', '<', Carbon::now()->endOfWeek())->count();
         $date = Carbon::now('UTC')->addHour('1')->format('d-m-Y');
         $data1 = Facture::select('id', 'created_at')->get()->groupBy(function($data1){
@@ -59,13 +63,13 @@ class AdminController extends Controller
             $monthCount[]=count($values);
 
         }
-        $contrats = DB::select( "SELECT (SELECT COUNT(*) FROM contrat_animals) as contrat_animals, (SELECT COUNT(*) FROM contrat_emprunteurs) as contrat_emprunteurs, (SELECT COUNT(*) FROM contrat_personnes) as contrat_personnes");
+        $contrats = DB::select( "SELECT (SELECT COUNT(*) FROM contrat_animals) as contrat_animals, (SELECT COUNT(*) FROM contrat_emprunteurs) as contrat_emprunteurs, (SELECT COUNT(*) FROM contrats) as contrats");
         $contrats = collect($contrats)->first();
 
         $facturs = Facture::all();
 
         //  dd($contrats);
-        return view('Admin/index', compact('gest', 'agent', 'client', 'clientweek', 'date', 'data1', 'months', 'monthCount', 'folders', 'contrats', 'facturs'));
+        return view('Admin/index', compact('gest', 'agent', 'client', 'clientweek', 'date', 'data1', 'months', 'monthCount', 'folders', 'contrats', 'facturs', 'projects'));
     }
    public function listeAgents(){
 
@@ -79,30 +83,19 @@ class AdminController extends Controller
     return view('Admin/listeGestionnaire', compact('gestionnaire'));
    }
 
-   public function listeContratAA(){
 
-    $contratAA = ContratAnimal::all();
-    return view('Admin/listeContratAA', compact('contratAA'));
-
-   }
-
-   public function listeContratAP(){
-    $contratAP = ContratPersonne::all();
-    return view('Admin/listeContratAP', compact('contratAP'));
+   public function listeContrat(){
+    $contrats = Contrats::orderBy('updated_at', 'DESC')->get();
+    return view('Admin/listeContrat', compact('contrats'));
    }
 
-   public function listeContratE(){
-    $contratE = ContratEmprunteur::all();
-    return view('Admin/listeContratE', compact('contratE'));
+   public function listeProjet(){
+    $projets = Assurances::all();
+    $assurancestypes = AssurancesType::all();
+    // dd($assurancestypes);
+    return view('Admin/listeProjet', compact('projets'));
    }
-   public function listeProjetAA(){
-    $projetAA = AssuranceAnimal::all();
-    return view('Admin/listeProjetAA', compact('projetAA'));
-   }
-   public function listeProjetAP(){
-    $projetAP = AssurancePersonne::all();
-    return view('Admin/listeProjetAP', compact('projetAP'));
-   }
+
    public function listeProjetE(){
     $projetE = Emprunteur::all();
     return view('Admin/listeProjetE', compact('projetE'));
@@ -325,15 +318,26 @@ public function deleteGestionnaire($id)
 
 
 
-    public function ajouter()
+    public function ajouterClient()
     {
-        return view('Admin/ajouter');
+        return view('Admin/ajouterClient');
     }
+
+    public function profileClient($id)
+    {
+        $client = Client::find($id);
+        $projets = Assurances::where('client_id', $id)->get();
+        $dossiers = Folder::where('client_id' , $id)->get();
+        $situations = Situation::all();
+        return view('Admin/profileClient' , compact('client' , 'projets' , 'dossiers' , 'situations'));
+    }
+
     public function listeClients()
     {
-        $client = Client::all();
+        $client = Client::orderBy('updated_at', 'DESC')->get();
         return view('Admin/listeClients', compact('client'));
     }
+
     
     public function contacterClients()
     {
@@ -341,31 +345,199 @@ public function deleteGestionnaire($id)
         return view('Admin/contacterClients', compact('client'));
     }
 
-    public function assurancePersonne()
+    public function pickclient()
     {
-        $gestionnaire = User::all()->where('role','Gestionnaire');
-        $client = Client::all();
-        return view('Admin/assurancePersonne', compact('client', 'gestionnaire'));
+        $clients = Client::all();
+        return view('Admin/listeClients', compact('clients'));
+    }
+    public function addprojet($client_id)
+    {
+        $gestionnaire = User::all()->where('role','2');
+        $client = Client::find($client_id);
+        $assurancestypes = AssurancesType::all();
+        // dd($assurancetype);
+        return view('Admin/ajouterProjet', compact('client', 'gestionnaire', 'assurancestypes'));
     }
 
-    public function assuranceAnimaux()
-    {
-        $gestionnaire = User::all()->where('role','Gestionnaire');
-        $client = Client::all();
-        return view('Admin/assuranceAnimaux', compact('client', 'gestionnaire'));
+    function storeprojet(Request $request){
+            
+        
+        $request->validate([ 'client_id' => 'required',
+                            'type'=> 'required', 
+                            'origine' => 'required', 
+                            'user_id' => 'required',
+                            'agent_id'=> 'required',
+                            'projetPrioritaire' => 'required',
+                            'statut' => 'required',
+                            'dateSouscription' => 'required',
+                            'dateEffet' => 'required',
+                            'commentaire' => 'required',
+                            'typeA'=>'',
+                            'civilite'=>'',
+                            'nom'=>'',
+                            'prenom'=>'',
+                            'dateNaissance'=>'',
+                            'regime'=>''
+                            ]);
+                            
+        $projetAP= new Assurances();
+       
+        $projetAP->user_id = $request->user_id;
+        $projetAP->agent_id = $request->agent_id;
+        $projetAP->client_id = $request->client_id;
+        $projetAP->type = $request->type;
+        $projetAP->origine = $request->origine;
+        $projetAP->projetPrioritaire = $request->projetPrioritaire;
+        $projetAP->statut = $request->statut;
+        $projetAP->dateSouscription = $request->dateSouscription;
+        $projetAP->dateEffet = $request->dateEffet;
+        $projetAP->commentaire = $request->commentaire;
+
+        $projetAP->save();
+
+        if($request->has('civilite')){
+
+            $assuranceP = $projetAP->id;
+            $type = $request->typeA;
+            $civilite = $request->civilite;
+            $nom = $request->nom;
+            $prenom = $request->prenom;
+            $dateN = $request->dateNaissance;
+            $regime = $request->regime;
+            
+            for($i=0; $i<count($dateN); $i++){
+                
+                $data[]  = [
+                    'assurance_id' =>$assuranceP,
+                    'type' => $type[$i],
+                    'civilite' => $civilite[$i],
+                    'nom' => $nom[$i],
+                    'prenom' => $prenom[$i],
+                    'dateNaissance' => $dateN[$i],
+                    'regime' => $regime[$i]
+                ];
+                
+                AssurePersonne::insert($data);
+            }
+            }elseif ($request->has('race')) {
+                $assuranceA = $projetAA->id;
+                $type = $request->typeA;
+                $race = $request->race;
+                $nom = $request->nom;
+                $sexe = $request->sexe;
+                $dateN = $request->dateNaissance;
+                
+                for($i=0; $i<count($dateN); $i++){
+
+                    $data[]  = [
+                        'assuranceAnimal_id' =>$assuranceA,
+                        'type' => $type[$i],
+                        'race' => $race[$i],
+                        'nom' => $nom[$i],
+                        'sexe' => $sexe[$i],
+                        'dateNaissance' => $dateN[$i],
+                    ];
+                    
+                    
+                    AssureAnimal::insert($data);
+            }}
+                // DB::table('assure_personnes')->insert($data);
+                // return $insert;
+        return back()->with('message', 'Un nouveau projet assurance personne est créé !');
+       
     }
-    public function emprunteur()
+
+    public function deleteProjetAP($id)
     {
-        $gestionnaire = User::all()->where('role','Gestionnaire');
-        $client = Client::all();
-        return view('Admin/emprunteur' , compact('client', 'gestionnaire'));
+        $projetAP = Assurances::findOrFail($id);
+        $assureAP = AssurePersonne::where('assurance_id', $id);
+        $contratAP = Contrats::where('assurance_id', $id);
+        $projetAP->delete();
+        $assureAP->delete();
+        $contratAP->delete();
+        return redirect()->back()->with('message', 'Projet supprimé avec succès !');
     }
+
+    public function  editProjetAP($id)
+    {
+        $projetAP = Assurances::find($id);
+        $client = Client::all();
+        $gestionnaire = User::all()->where ('role', 'Gestionnaire');
+        $assure = AssurePersonne::all()->where ('assurance_id', $projetAP->id);
+        return view('Admin/edit/editProjetAP', compact('projetAP', 'client', 'gestionnaire', 'assure'));
+    }
+
+    public function  updateProjetAP(Request $request, $id)
+    {
+
+        $projetAP = Assurances::find($id);
+
+        $request->validate([ 'client_id' => 'required',
+                            'type'=> 'required', 
+                            'origine' => 'required', 
+                            'user_id' => 'required',
+                            'projetPrioritaire' => 'required',
+                            'statut' => 'required',
+                            'dateSouscription' => 'required',
+                            'dateEffet' => 'required',
+                            'commentaire' => 'required',
+                            'typeA',
+                            'civilite',
+                            'nom',
+                            'prenom',
+                            'dateNaissance',
+                            'regime'
+                            
+                            ]);
+        
+        $projetAP->user_id = $request->user_id;
+        $projetAP->client_id = $request->client_id;
+        $projetAP->type = $request->type;
+        $projetAP->origine = $request->origine;
+        $projetAP->projetPrioritaire = $request->projetPrioritaire;
+        $projetAP->statut = $request->statut;
+        $projetAP->dateSouscription = $request->dateSouscription;
+        $projetAP->dateEffet = $request->dateEffet;
+        $projetAP->commentaire = $request->commentaire;
+                    
+        $projetAP->save();
+        if(empty($request->typeA)){
+            return redirect('Admin/listeProjetAP')->with('message', 'Projet Modifié avec succès! ');
+        }
+        else{
+        $assuranceP = $projetAP->id;
+        $type = $request->typeA;
+        $civilite = $request->civilite;
+        $nom = $request->nom;
+        $prenom = $request->prenom;
+        $dateN = $request->dateNaissance;
+        $regime = $request->regime;
+
+        for($i=0; $i<count($dateN); $i++){
+
+            $data[]  = [
+                'assurance_id' =>$assuranceP,
+                 'type' => $type[$i],
+                 'civilite' => $civilite[$i],
+                 'nom' => $nom[$i],
+                 'prenom' => $prenom[$i],
+                 'dateNaissance' => $dateN[$i],
+                 'regime' => $regime[$i]
+            ];
+            
+            AssurePersonne::insert($data);
+        }
+        return redirect('Admin/listeProjetAP')->with('message', 'Projet Modifié avec succès! ');
+       }
+        
+    }
+
 
     public function findProjetAP($id)
     {
-        $projetAP = AssurancePersonne::find($id);
-        $assure = AssurePersonne::all()->where('assurancePersonne_id', $projetAP->id);
-        if(empty(ContratPersonne::count())){
+        $projetAP = Assurances::find($id);
+        $assure = AssurePersonne::all()->where('assurance_id', $projetAP->id);
+        if(empty(Contrats::count())){
             $numContrat ='A';
             $numContrat.=Carbon::now('UTC')->addHour('1')->format('dmY');
             $numContrat.='00001';
@@ -377,7 +549,7 @@ public function deleteGestionnaire($id)
         $varDate=Carbon::now('UTC')->addHour('1')->format('dmY');
         $numContrat.=Carbon::now('UTC')->addHour('1')->format('dmY');
         $numContrat.='0000';
-        $contrat = DB::table('contrat_personnes')->orderby('id', 'desc')->value('N_Contrat');
+        $contrat = DB::table('contrats')->orderby('id', 'desc')->value('N_Contrat');
         $varArray = str_split($contrat, 1);
         $date = $varArray[1].$varArray[2].$varArray[3].$varArray[4].$varArray[5].$varArray[6].$varArray[7].$varArray[8];
         $nbr = $varArray[11].$varArray[12].$varArray[13];
@@ -482,7 +654,7 @@ public function deleteGestionnaire($id)
                             'adresse' => 'required',
                             'complementAdresse' => 'required',
                             'codePostal' => 'required',
-                            'email' => 'required',
+                            'email' => 'required|unique:clients',
                             'ville' => 'required']);
         $client = new Client();
         $client->civilite = $request->civilite;
@@ -497,19 +669,19 @@ public function deleteGestionnaire($id)
         $client->ville = $request->ville;
 
         $client->save();
-        return redirect('Admin/ajouter')->with('message', 'Client inséré avec succès !');
+        return redirect('/clients')->with('message', 'Client inséré avec succès !');
     }
 
     public function deleteClient($id)
     {
         $client = Client::findOrFail($id);
-        $projetAP = AssurancePersonne::where('client_id', $id);
+        $projetAP = Assurances::where('client_id', $id);
         $projetAA = AssuranceAnimal::where('client_id', $id);
         $projetE = Emprunteur::where('client_id', $id);
-        $contratAP = ContratPersonne::where('client_id', $id);
+        $contratAP = Contrats::where('client_id', $id);
         $contratAA = ContratAnimal::where('client_id', $id);
         $contratE = ContratEmprunteur::where('client_id', $id);
-        $factureAP = FacturePersonne::where('client_id', $id);
+        $factureAP = Factures::where('client_id', $id);
         $factureAA = FactureAnimal::where('client_id', $id);
         $factureE = FactureEmprunteur::where('client_id', $id);
 
@@ -564,153 +736,7 @@ public function deleteGestionnaire($id)
         return redirect('Admin/listeClients')->with('message', 'Client Modifié avec succès! ');
     }
 
-    function storeAssuranceP(Request $request){
-            
-        
-        $request->validate([ 'client_id' => 'required',
-                            'type'=> 'required', 
-                            'origine' => 'required', 
-                            'user_id' => 'required',
-                            'agent_id'=> 'required',
-                            'projetPrioritaire' => 'required',
-                            'statut' => 'required',
-                            'dateSouscription' => 'required',
-                            'dateEffet' => 'required',
-                            'commentaire' => 'required',
-                            'typeA'=>'required',
-                            'civilite'=>'required',
-                            'nom'=>'required',
-                            'prenom'=>'required',
-                            'dateNaissance'=>'required',
-                            'regime'=>'required'
-                            ]);
-                            
-        $projetAP= new AssurancePersonne();
-       
-        $projetAP->user_id = $request->user_id;
-        $projetAP->agent_id = $request->agent_id;
-        $projetAP->client_id = $request->client_id;
-        $projetAP->type = $request->type;
-        $projetAP->origine = $request->origine;
-        $projetAP->projetPrioritaire = $request->projetPrioritaire;
-        $projetAP->statut = $request->statut;
-        $projetAP->dateSouscription = $request->dateSouscription;
-        $projetAP->dateEffet = $request->dateEffet;
-        $projetAP->commentaire = $request->commentaire;
 
-        $projetAP->save();
-        $assuranceP = $projetAP->id;
-        $type = $request->typeA;
-        $civilite = $request->civilite;
-        $nom = $request->nom;
-        $prenom = $request->prenom;
-        $dateN = $request->dateNaissance;
-        $regime = $request->regime;
-
-        for($i=0; $i<count($dateN); $i++){
-
-            $data[]  = [
-                'assurancePersonne_id' =>$assuranceP,
-                 'type' => $type[$i],
-                 'civilite' => $civilite[$i],
-                 'nom' => $nom[$i],
-                 'prenom' => $prenom[$i],
-                 'dateNaissance' => $dateN[$i],
-                 'regime' => $regime[$i]
-            ];
-            
-            AssurePersonne::insert($data);
-           // DB::table('assure_personnes')->insert($data);
-           // return $insert;
-        }
-        return back()->with('message', 'Un nouveau projet assurance personne est créé !');
-       
-    }
-
-    public function deleteProjetAP($id)
-    {
-        $projetAP = AssurancePersonne::findOrFail($id);
-        $assureAP = AssurePersonne::where('assurancePersonne_id', $id);
-        $contratAP = ContratPersonne::where('assurancePersonne_id', $id);
-        $projetAP->delete();
-        $assureAP->delete();
-        $contratAP->delete();
-        return redirect()->back()->with('message', 'Projet supprimé avec succès !');
-    }
-
-    public function  editProjetAP($id)
-    {
-        $projetAP = AssurancePersonne::find($id);
-        $client = Client::all();
-        $gestionnaire = User::all()->where ('role', 'Gestionnaire');
-        $assure = AssurePersonne::all()->where ('assurancePersonne_id', $projetAP->id);
-        return view('Admin/edit/editProjetAP', compact('projetAP', 'client', 'gestionnaire', 'assure'));
-    }
-
-    public function  updateProjetAP(Request $request, $id)
-    {
-
-        $projetAP = AssurancePersonne::find($id);
-
-        $request->validate([ 'client_id' => 'required',
-                            'type'=> 'required', 
-                            'origine' => 'required', 
-                            'user_id' => 'required',
-                            'projetPrioritaire' => 'required',
-                            'statut' => 'required',
-                            'dateSouscription' => 'required',
-                            'dateEffet' => 'required',
-                            'commentaire' => 'required',
-                            'typeA',
-                            'civilite',
-                            'nom',
-                            'prenom',
-                            'dateNaissance',
-                            'regime'
-                            
-                            ]);
-        
-        $projetAP->user_id = $request->user_id;
-        $projetAP->client_id = $request->client_id;
-        $projetAP->type = $request->type;
-        $projetAP->origine = $request->origine;
-        $projetAP->projetPrioritaire = $request->projetPrioritaire;
-        $projetAP->statut = $request->statut;
-        $projetAP->dateSouscription = $request->dateSouscription;
-        $projetAP->dateEffet = $request->dateEffet;
-        $projetAP->commentaire = $request->commentaire;
-                    
-        $projetAP->save();
-        if(empty($request->typeA)){
-            return redirect('Admin/listeProjetAP')->with('message', 'Projet Modifié avec succès! ');
-        }
-        else{
-        $assuranceP = $projetAP->id;
-        $type = $request->typeA;
-        $civilite = $request->civilite;
-        $nom = $request->nom;
-        $prenom = $request->prenom;
-        $dateN = $request->dateNaissance;
-        $regime = $request->regime;
-
-        for($i=0; $i<count($dateN); $i++){
-
-            $data[]  = [
-                'assurancePersonne_id' =>$assuranceP,
-                 'type' => $type[$i],
-                 'civilite' => $civilite[$i],
-                 'nom' => $nom[$i],
-                 'prenom' => $prenom[$i],
-                 'dateNaissance' => $dateN[$i],
-                 'regime' => $regime[$i]
-            ];
-            
-            AssurePersonne::insert($data);
-        }
-        return redirect('Admin/listeProjetAP')->with('message', 'Projet Modifié avec succès! ');
-       }
-        
-    }
     
 
 
@@ -747,29 +773,7 @@ public function deleteGestionnaire($id)
         $projetAA->commentaire = $request->commentaire;
 
         $projetAA->save();
-        $assuranceA = $projetAA->id;
-        $type = $request->typeA;
-        $race = $request->race;
-        $nom = $request->nom;
-        $sexe = $request->sexe;
-        $dateN = $request->dateNaissance;
-        
-        for($i=0; $i<count($dateN); $i++){
 
-            $data[]  = [
-                'assuranceAnimal_id' =>$assuranceA,
-                 'type' => $type[$i],
-                 'race' => $race[$i],
-                 'nom' => $nom[$i],
-                 'sexe' => $sexe[$i],
-                 'dateNaissance' => $dateN[$i],
-            ];
-            
-            
-            AssureAnimal::insert($data);
-           // DB::table('assure_personnes')->insert($data);
-           // return $insert;
-        }
         return redirect('/Admin/assuranceAnimaux')->with('message', 'Un nouveau projet assurance Animal est créé !');
     }
 
@@ -938,7 +942,7 @@ public function deleteGestionnaire($id)
     function storeContratAP(Request $request, $id){
 
         
-        $projetAP = AssurancePersonne::find($id);
+        $projetAP = Assurances::find($id);
 
         $request->validate(['client_id'=> 'required', 
                             'N_Version' => 'required',
@@ -984,9 +988,9 @@ public function deleteGestionnaire($id)
                         ]);
 
 
-        $contratAP = new ContratPersonne();
+        $contratAP = new Contrats();
         $contratAP->client_id = $request->client_id;
-        $contratAP->assurancePersonne_id =  $projetAP->id;
+        $contratAP->assurance_id =  $projetAP->id;
         $contratAP->gestionnaire_id = $projetAP->user_id;
         $contratAP->agent_id = $projetAP->agent_id;
         $contratAP->N_Version = $request->N_Version;
@@ -1132,7 +1136,7 @@ public function deleteGestionnaire($id)
                 $fileModel->copie_jugement_path = '/storage/' . $filePath6;
         }
     
-            $fileModel->assurancePersonne_id = $projetAP->id;
+            $fileModel->assurance_id = $projetAP->id;
             $fileModel->save();
         
         
@@ -1142,8 +1146,8 @@ public function deleteGestionnaire($id)
 
     public function deleteContratAP($id)
     {
-        $contratAP = ContratPersonne::find($id);
-        $facture = FacturePersonne::where('contratPersonne_id', $id);
+        $contratAP = Contrats::find($id);
+        $facture = Factures::where('contrats_id', $id);
         $facture->delete();
         $contratAP->delete();
         return redirect()->back()->with('message', 'Contrat supprimé avec succès !');
@@ -1304,16 +1308,25 @@ public function deleteGestionnaire($id)
     }
 
 
-    public function singleContratAP($id){
+    public function singleContrat($id){
+
+        $numFacture ='F';
+        $varDate=Carbon::now('UTC')->addHour('1')->format('dmY');
+        $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
+        $numFacture.='0000';
+        $facture = DB::table('factures')->orderby('id', 'desc')->value('N_Facture');
+        $varArray = str_split($facture, 1);
+        // $date = $varArray[1].$varArray[2].$varArray[3].$varArray[4].$varArray[5].$varArray[6].$varArray[7].$varArray[8];
+        // $nbr = $varArray[11].$varArray[12].$varArray[13];
             
-        $contrat = ContratPersonne::find($id);
+        $contrat = Contrats::find($id);
         
-        return view('Admin/singleContratAP', compact('contrat'));
+        return view('Admin/singleContrat', compact('contrat' , 'numFacture'));
     }
 
     public function telechargerContratAP(request $request){
         
-        $contrat = ContratPersonne::find($request->id);
+        $contrat = Contrats::find($request->id);
         $pdf = PDF::loadView('Admin/singleContratAP',compact('contrat'));
         return $pdf->download($contrat->N_Contrat.'.pdf');
 
@@ -1326,7 +1339,7 @@ public function deleteGestionnaire($id)
 
     public function telechargerContratAA(request $request){
         
-        $contrat = ContratPersonne::find($request->id);
+        $contrat = Contrats::find($request->id);
         $pdf = PDF::loadView('Admin/singleContratAA',compact('contrat'));
         return $pdf->download($contrat->N_Contrat.'.pdf');
 
@@ -1345,186 +1358,76 @@ public function deleteGestionnaire($id)
 
     }
 
-    // public function deleteAssureAP($id)
-    // {
-    //     $projetAP = AssurancePersonne::findOrFail($id);
-    //     $assure = AssurePersonne::where('assurancePersonne_id', $id);
-    //     $assure->delete();
-    //     return redirect()->back();
-    // }
-    // public function deleteAssureAA($id)
-    // {
-    //     $projetAA = AssuranceAnimal::findOrFail($id);
-        
-    //     $assure = AssureAnimal::where('assuranceAnimal_id', $id);
-    //     $assure->delete();
-    //     return redirect()->back();
-    // }
 
 
-    public function factureAP()
+    public function factures()
     {
-        if(empty(FacturePersonne::count())){
+        if(empty(Factures::count())){
             $numFacture ='F';
             $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
             $numFacture.='00001';
             $user = Auth::user();
-            $contratAP = ContratPersonne::all();
+            $contratAP = Contrats::all();
             $client = Client::all();
-            $facture = FacturePersonne::all();
-            return view('Admin/factureAP', compact('client', 'numFacture', 'contratAP','facture'));
+            $factures = Factures::orderBy('updated_at', 'DESC')->get();
+            return view('Admin/factures', compact('client', 'numFacture', 'contratAP','factures'));
         }
         else{
         $numFacture ='F';
         $varDate=Carbon::now('UTC')->addHour('1')->format('dmY');
         $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
         $numFacture.='0000';
-        $facture = DB::table('facture_personnes')->orderby('id', 'desc')->value('N_Facture');
-        $varArray = str_split($facture, 1);
+        $factures = DB::table('factures')->orderby('id', 'desc')->value('N_Facture');
+        $varArray = str_split($factures, 1);
         $date = $varArray[1].$varArray[2].$varArray[3].$varArray[4].$varArray[5].$varArray[6].$varArray[7].$varArray[8];
-        $nbr = $varArray[11].$varArray[12].$varArray[13];
+        // $nbr = $varArray[11].$varArray[12].$varArray[13];
         
         
         if($date == $varDate){
             $numFacture ='F';
             $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
             $numFacture.='0000'; 
-            $numFacture.=(int)$nbr+1;
+            // $numFacture.=(int)$nbr+1;
             $user = Auth::user();
-            $contratAP = ContratPersonne::all();
+            $contratAP = Contrats::all();
             $client = Client::all();
-            $facture = FacturePersonne::all()->where('gestionnaire_id', $user->id);
-            return view('Admin/factureAP', compact('client', 'numFacture', 'contratAP','facture'));
+            $factures = Factures::orderBy('updated_at', 'DESC')->get();
+            return view('Admin/factures', compact('client', 'numFacture', 'contratAP','factures'));
         }
         else{
             $numFacture ='F';
             $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
             $numFacture.='00001';
             $user = Auth::user();
-            $contratAP = ContratPersonne::all();
+            $contratAP = Contrats::all();
             $client = Client::all();
-            $facture = FacturePersonne::all()->where('user_id', $user->id);
-            return view('Admin/factureAP', compact('client', 'numFacture', 'contratAP','facture'));
+            $factures = Factures::orderBy('updated_at', 'DESC')->get();
+            return view('Admin/factures', compact('client', 'numFacture', 'contratAP','factures'));
         }
      }
-    }
-
-    public function factureAA()
-    {
-        if(empty(FactureAnimal::count())){
-            $numFacture ='F';
-            $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-            $numFacture.='00001';
-            $user = Auth::user();
-            $contratAA = ContratAnimal::all();
-            $client = Client::all();
-            $facture = FactureAnimal::all();
-            return view('Admin/factureAA', compact('client', 'numFacture', 'contratAA','facture'));
-        }
-        else{
-        $numFacture ='F';
-        $varDate=Carbon::now('UTC')->addHour('1')->format('dmY');
-        $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-        $numFacture.='0000';
-        $facture = DB::table('facture_animals')->orderby('id', 'desc')->value('N_Facture');
-        $varArray = str_split($facture, 1);
-        $date = $varArray[1].$varArray[2].$varArray[3].$varArray[4].$varArray[5].$varArray[6].$varArray[7].$varArray[8];
-        $nbr = $varArray[11].$varArray[12].$varArray[13];
-        
-        
-        if($date == $varDate){
-            $numFacture ='F';
-            $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-            $numFacture.='0000'; 
-            $numFacture.=(int)$nbr+1;
-            $user = Auth::user();
-            $contratAA = ContratAnimal::all();
-            $client = Client::all();
-            $facture = FactureAnimal::all();
-            return view('Admin/factureAA', compact('client', 'numFacture', 'contratAA','facture'));
-        }
-        else{
-            $numFacture ='F';
-            $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-            $numFacture.='00001';
-            $user = Auth::user();
-            $contratAA = ContratAnimal::all();
-            $client = Client::all();
-            $facture = FactureAnimal::all();
-            return view('Admin/factureAA', compact('client', 'numFacture', 'contratAA','facture'));
-        }
-     }
-    }
-    public function factureE()
-    {
-        if(empty(FactureEmprunteur::count())){
-            $numFacture ='F';
-            $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-            $numFacture.='00001';
-            $user = Auth::user();
-            $contratE = ContratEmprunteur::all();
-            $client = Client::all();
-            $facture = FactureEmprunteur::all();
-            return view('Admin/factureE', compact('client', 'numFacture', 'contratE','facture'));
-        }
-        else{
-        
-        $numFacture ='F';
-        $varDate=Carbon::now('UTC')->addHour('1')->format('dmY');
-        $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-        $numFacture.='0000';
-        $facture = DB::table('facture_emprunteurs')->orderby('id', 'desc')->value('N_Facture');
-        $varArray = str_split($facture, 1);
-        $date = $varArray[1].$varArray[2].$varArray[3].$varArray[4].$varArray[5].$varArray[6].$varArray[7].$varArray[8];
-        $nbr = $varArray[11].$varArray[12].$varArray[13];
-        
-        
-        if($date == $varDate){
-            $numFacture ='F';
-            $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-            $numFacture.='0000'; 
-            $numFacture.=(int)$nbr+1;
-            $user = Auth::user();
-            $contratE = ContratEmprunteur::all();
-            $client = Client::all();
-            $facture = FactureEmprunteur::all();
-            return view('Admin/factureE', compact('client', 'numFacture', 'contratE','facture'));
-        }
-        else{
-            $numFacture ='F';
-            $numFacture.=Carbon::now('UTC')->addHour('1')->format('dmY');
-            $numFacture.='00001';
-            $user = Auth::user();
-            $contratE = ContratEmprunteur::all();
-            $client = Client::all();
-            $facture = FactureEmprunteur::all();
-            return view('Admin/factureE', compact('client', 'numFacture', 'contratE','facture'));
-        }
-      }
     }
 
     
-    public function singleFactureAP($id){
+
+    
+    public function singleFacture($id){
             
-        $facture = FacturePersonne::find($id);
-        return view('Admin/singleFactureAP', compact('facture'));
+        $facture = Factures::find($id);
+        return view('Admin/singleFacture', compact('facture'));
     }
 
-    public function singleFactureAA($id){
-            
-        $facture = FactureAnimal::find($id);
-        return view('Admin/singleFactureAA', compact('facture'));
-    }
-    public function singleFactureE($id){
-            
-        $facture = FactureEmprunteur::find($id);
-        return view('Admin/singleFactureE', compact('facture'));
+    public function deletefacture($id){
+        $facture = Factures::findOrFail($id);
+        $facture->delete();
+
+        return redirect()->back()->with('message' , 'Facture Supprime avec success !');
     }
 
-    public function telechargerFactureAP(request $request){
+
+    public function telechargerFacture(request $request){
         
-        $facture = FacturePersonne::find($request->id);
-        $pdf = PDF::loadView('Admin/singleFactureAP',compact('facture'));
+        $facture = Factures::find($request->id);
+        $pdf = PDF::loadView('Admin/singleFacture',compact('facture'));
         return $pdf->download($facture->N_Facture.'.pdf');
 
     }
@@ -1544,7 +1447,7 @@ public function deleteGestionnaire($id)
 
     }
 
-    function storeFactureAP(Request $request){
+    function storeFactures(Request $request){
         
         $request->validate(['N_Facture'=> 'required',
                             'contrat_id'=> 'required', 
@@ -1555,9 +1458,9 @@ public function deleteGestionnaire($id)
                             'statut' => 'required',
                             'Montant' => 'required',
                             'tva' => 'required'   ]);
-        $facture = new FacturePersonne();
+        $facture = new Factures();
         $facture->N_Facture = $request->N_Facture;
-        $facture->contratPersonne_id = $request->contrat_id;
+        $facture->contrat_id = $request->contrat_id;
         $facture->gestionnaire_id = $request->gestionnaire_id;
         $facture->Designation = $request->Designation;
         $facture->Date_emission = $request->Date_emission;
@@ -1565,19 +1468,11 @@ public function deleteGestionnaire($id)
         $facture->statut = $request->statut;
         $facture->Montant = $request->Montant;
         $facture->taux_tva = $request->tva;
-        $factureF = new Facture();
-        $factureF->N_Facture = $request->N_Facture;
-        $factureF->contrat_id = $request->contrat_id;
-        $factureF->Designation = $request->Designation;
-        $factureF->Date_emission = $request->Date_emission;
-        $factureF->Reglement = $request->Reglement;
-        $factureF->statut = $request->statut;
-        $factureF->Montant = $request->Montant;
-        $factureF->taux_tva = $request->tva;
-        $factureF->save();
         $facture->save();
-        return redirect('Admin/factureAP')->with('message', 'Nouvelle Facture insérée avec succès !');
+        return redirect()->back()->with('message', 'Nouvelle Facture insérée avec succès !');
     }
+
+    
     function storeFactureAA(Request $request){
         
         $request->validate(['N_Facture'=> 'required', 
@@ -1634,7 +1529,7 @@ public function deleteGestionnaire($id)
         $facture->Montant = $request->Montant;
         $facture->taux_tva = $request->tva;
 
-        $factureF = new Facture();
+        $factureF = new Factures();
         $factureF->N_Facture = $request->N_Facture;
         $factureF->contrat_id = $request->contrat_id;
         $factureF->Designation = $request->Designation;

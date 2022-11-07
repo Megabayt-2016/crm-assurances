@@ -42,11 +42,11 @@ class LoginController extends Controller
         $role = auth()->user()->role;
         
             switch ($role) {
-                case 'Gestionnaire':
+                case '2':
                     return "/Gestionnaire/index";
                 break;
-                case 'Admin':
-                    return "/Admin/index";
+                case '1':
+                    return "/dashboard";
                     break;
                     
                 default:

@@ -18,7 +18,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
-        if(auth()->user()->role == 'Admin'){
+        if(auth()->user()->role == '1'){
             return $next($request);
           }
             return redirect('login')->with('error','Vous êtes pas autentifié');

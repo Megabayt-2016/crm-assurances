@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAssurancePersonnesTable extends Migration
+class CreateAssurancesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateAssurancePersonnesTable extends Migration
      */
     public function up()
     {
-        Schema::create('assurance_personnes', function (Blueprint $table) {
+        Schema::create('assurances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')
                   ->constrained()
@@ -42,6 +42,6 @@ class CreateAssurancePersonnesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('assurance_personnes');
+        Schema::dropIfExists('assurances');
     }
 }

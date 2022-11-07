@@ -349,11 +349,9 @@
                                  <div class="card-body">
                                     <label for="Type">Type de projet :</label>
                                     <select class="form-control form-control-lg" id="type" name="type">
-                                       <option >Complémentaire santé</option>
-                                       <option >Assurance Auto</option>
-                                       <option >Assurance Moto</option>
-                                       <option >Assurance Habitation</option>
-                                       <option >Assurance Obsèque</option>
+                                       @foreach ($assurancestypes as $type)
+                                       <option value="{{$type->id}}" >{{$type->nom}}</option>
+                                       @endforeach
                                     </select>
                                     <br>
                                     <label for="origine">Origine :</label>
@@ -585,11 +583,7 @@
       <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
       <!-- Custom scripts for all pages-->
       <script src="{{asset('js/sb-admin-2.min.js')}}"></script>
-      <!-- Page level plugins -->
-      <script src="{{asset('vendor/chart.js/Chart.min.js')}}"></script>
-      <!-- Page level custom scripts -->
-      <script src="{{asset('js/demo/chart-area-demo.js')}}"></script>
-      <script src="{{asset('js/demo/chart-pie-demo.js')}}"></script>
+
       
       <script>
          //  const btn=document.getElementById("btn");

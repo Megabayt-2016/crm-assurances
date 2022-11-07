@@ -17,7 +17,7 @@ class Agent
      */
     public function handle(Request $request, Closure $next)
     {
-        if(auth()->user()->role == 'Agent'){
+        if(auth()->user()->role == '3'){
             return $next($request);
           }
             return redirect('login')->with('error','Vous êtes pas autentifié');

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -32,7 +32,7 @@
     {{-- <link href="{{asset('../css/sb-admin-2.min.css')}}" rel="stylesheet"> --}}
     <!-- Custom styles for this template-->
     <link href="{{asset('../css/style.css')}}" rel="stylesheet">
-
+    @yield('styles')
      <!-- Bootstrap core JavaScript-->
      <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
      <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>

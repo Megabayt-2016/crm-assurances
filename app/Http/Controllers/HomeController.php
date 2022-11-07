@@ -79,7 +79,8 @@ class HomeController extends Controller
     {
         $gestionnaire = User::all()->where('role','Gestionnaire');
         $client = Client::all();
-        return view('assurancePersonne', compact('client', 'gestionnaire'));
+        $assurancestypes = AssurancesType::all();
+        return view('assurancePersonne', compact('client', 'gestionnaire', 'assurancestypes'));
     }
 
     public function assuranceAnimaux()

@@ -76,7 +76,4 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
-    public function hello(){
-        echo 'hello';
-    }
 }

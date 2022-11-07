@@ -1,11 +1,12 @@
 
-<div class="container bg-white p-3 my-4">
+<div class="container p-3 my-4">
     @if($errors->any()) 
         <div class="alert alert-success" role="alert">
             <h4 class="text-center mt-2">{{$errors->first()}}</h4>
         </div>
     @endif
-    <div class="card-tools d-flex align-items-center col-lg-12 mx-auto mb-0">
+    <div class="card d-flex align-items-center">
+        <h5 class="my-2">filter Les Dossier</h5>
         <div class="col-lg-12 mx-auto">
             <div class="career-search mb-60">
                 <div class="filter-result">
@@ -53,14 +54,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="col pr-0" style="min-width: 120px">
-                                        <div class="input-group input-group-md flex-grow-1">
-                                            <input type="text" name="recherche" id="recherche"
-                                                   class="form-control float-right"
-                                                   placeholder="Rechercher"
-                                                   wire:model.debounce.250ms="recherche">
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -71,89 +65,97 @@
     </div>
     <div>
         <div class="card">
-            <div class="card-header" style="background-color: #003d72">
-
+            <div class="card-header">
+                <div class="row justify-content-between">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <input type="text" name="recherche" id="recherche"
+                                class="form-control"
+                                placeholder="Recherche Client/email/Telephone"
+                                wire:model.debounce.250ms="recherche">
+                        </div>
+                    </div>
+                    <div class="col-md-4 justify-end">
+                        <a href="{{ url('/ajouterclient')}}" class="btn  btn-success float-right">Ajouter Nouveau Client</a>
+                    </div>
+                </div>
             </div>
-            <div class="card-body p-0">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>
-                            Nom et prénom
-                        </th>
-                        <th>
-                            Email
-                        </th>
-                        <th>
-                            Téléphone
-                        </th>
-                        <th>
-                            Documents
-                        </th>
-                        <th>
-                            Dossiers
-                        </th>
-                        <th>
-                            Nouveau Dossier
-                        </th>
-                        <th>
-
-                        </th>
-                    </tr>
-
-                    </thead>
-
-                    <tbody>
-                    @foreach($guests as $guest)
+            <div class="card-body table-border-style">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
                         <tr>
-                            <td>{{ $guest->nom }} {{ $guest->prenom }}</td>
-                            <td>{{ $guest->email }}</td>
-                            <td>{{ $guest->telephone }}</td>
-                            <td>{{ $guest->created_at->format('d-m-Y') }}</td>
-                            @if(isset($guest->folder))
-                                <td>
-                                    @foreach($guest->folder as $folder)
-                                        @if (( $folder->status_id ) == 1)
-                                            <a class="btn btn-sm btn-danger"
-                                               href="{{ route('details', ['folder_id' => $folder->id, 'client_id' => $folder->guest->id]) }}">CCA22{{ $folder->id }}</a>
-                                        @elseif (( $folder->status_id ) == 2)
-                                            <a class="btn btn-sm btn-warning"
-                                               href="{{ route('details', ['folder_id' => $folder->id, 'client_id' => $folder->guest->id]) }}">CCA22{{ $folder->id }}</a>
-                                        @else
-                                            <a class="btn btn-sm btn-success"
-                                               href="{{ route('details', ['folder_id' => $folder->id, 'client_id' => $folder->guest->id]) }}">CCA22{{ $folder->id }}</a>
-                                        @endif
-                                    @endforeach
-                                </td>
-                            @endif
-                            <td>
-                                <div class="dropdown">
-                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button"
-                                       data-bs-toggle="dropdown" aria-expanded="false">
-                                        Nouveau
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        @foreach($situations as $situation)
-                                            {{--                                        {{dd($guest->id)}}--}}
-                                            <li><a class="dropdown-item"
-                                                   href="{{route('sendmail', ['situation_id' => $situation->id, 'client_id' => encrypt($guest->id)])}}">{{ $situation->nom }}</a>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-danger center" wire:click="confirmDelete({{$guest->id}})">Supprimer</button>
-                            </td>
+                            <th>
+                                #
+                            </th>
+                            <th>
+                                Nom et prénom
+                            </th>
+                            <th>
+                                Email
+                            </th>
+                            <th>
+                                Téléphone
+                            </th>
+                            <th>
+                                Date Creation
+                            </th>
+                            <th>
+                                Dossier
+                            </th>
+                            <th>
+                                Action
+                            </th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+
+                        </thead>
+
+                        <tbody>
+                        @foreach($guests as $guest)
+                            <tr>
+                                <td>{{ $guest->id }}</td>
+                                <td>{{ $guest->nom }} {{ $guest->prenom }}</td>
+                                <td>{{ $guest->email }}</td>
+                                <td>{{ $guest->tele }}</td>
+                                <td>{{ $guest->created_at->format('d-m-Y') }}</td>
+                                @if(isset($guest->folder))
+                                    <td>
+                                        @foreach($guest->folder as $folder)
+                                            @if (( $folder->status_id ) == 1)
+                                                <a class="btn btn-sm btn-danger"
+                                                href="{{ route('details', ['folder_id' => $folder->id, 'client_id' => $folder->guest->id]) }}">CCA22{{ $folder->id }}</a>
+                                            @elseif (( $folder->status_id ) == 2)
+                                                <a class="btn btn-sm btn-warning"
+                                                href="{{ route('details', ['folder_id' => $folder->id, 'client_id' => $folder->guest->id]) }}">CCA22{{ $folder->id }}</a>
+                                            @else
+                                                <a class="btn btn-sm btn-success"
+                                                href="{{ route('details', ['folder_id' => $folder->id, 'client_id' => $folder->guest->id]) }}">CCA22{{ $folder->id }}</a>
+                                            @endif
+                                        @endforeach
+                                    </td>
+                                @endif
+                                <td >
+                                    <div class="btn-group dropstart mr-2">
+                                        <button class="btn  btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="feather icon-file-plus"></i></button>
+                                        <ul class="dropdown-menu">
+                                            @foreach($situations as $situation)
+                                                <li><a class="dropdown-item" href="{{route('sendmail', ['situation_id' => $situation->id, 'client_id' => encrypt($guest->id)])}}">{{ $situation->nom }}</a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <button type="button" class="btn  btn-icon btn-outline-danger"  wire:click="confirmDelete({{$guest->id}})"><i class="feather icon-trash"></i></button>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="mt-4 d-flex justify-content-center">
+                {{ $guests->links() }}
             </div>
         </div>
-    </div>
-    <div class="mt-4 d-flex justify-content-center">
-        {{ $guests->links() }}
     </div>
 </div>
 

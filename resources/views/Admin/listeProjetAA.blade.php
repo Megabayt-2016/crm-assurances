@@ -35,7 +35,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
 <!-- Sidebar - Brand -->
-<a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url('/Admin/index')}}">
+<a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url('/dashboard')}}">
     <div class="sidebar-brand-icon ">
       <i>
          <img src="{{asset('../img/CCA-removebg-preview.png')}}" style="margin-top: 15%; width:65%"/>
@@ -48,7 +48,7 @@
 
 <!-- Nav Item - Dashboard -->
 <li class="nav-item active">
-    <a class="nav-link" href="{{url('/Admin/index')}}">
+    <a class="nav-link" href="{{url('/dashboard')}}">
         <i class="fas fa-fw fa-tachometer-alt"></i>
         <span>Dashboard</span></a>
 </li>
@@ -75,7 +75,7 @@
     <div id="collapseProjet" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
        <div class="bg-white py-2 collapse-inner rounded">
           <h6 class="collapse-header">Custom Components:</h6>
-          <a class="collapse-item" href="{{url('/Admin/assurancePersonne')}}">Assurance Personnes</a>
+          <a class="collapse-item" href="{{url('/projets')}}">Assurance Personnes</a>
           <a class="collapse-item" href="{{url('/Admin/assuranceAnimaux')}}">Assurance Animaux</a>
           <a class="collapse-item" href="{{url('/Admin/emprunteur')}}">Emprunteurs</a>
        </div>
@@ -132,7 +132,7 @@
     <div id="collapselisteProjet" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">liste des projets:</h6>
-            <a class="collapse-item" href="{{url('/Admin/listeProjetAP')}}">Assurance Personnes</a>
+            <a class="collapse-item" href="{{url('/projects')}}">Assurance Personnes</a>
             <a class="collapse-item" href="{{url('/Admin/listeProjetAA')}}">Assurance Animaux</a>
             <a class="collapse-item" href="{{url('/Admin/listeProjetE')}}">Emprunteurs</a>
         </div>
@@ -431,19 +431,19 @@
                                         </tr>
                                     </tfoot>
                                     <tbody>
-                                    @foreach ($projetAA as $projetAA)
+                                    @foreach ($projetsAA as $projetAA)
                                         <tr>
-                                            <td>{{$projetAA -> client -> nom}} {{$projetAA -> client -> prenom}}</td>
-                                            <td>{{$projetAA -> type}}</td>
-                                            <td>{{$projetAA -> origine}}</td>
-                                            <td>{{$projetAA -> user -> nom}} {{$projetAA -> user -> prenom}}</td>
-                                            <td>{{$projetAA -> projetPrioritaire}}</td>
-                                            <td>{{$projetAA -> statut}}</td>
-                                            <td>{{$projetAA -> created_at}}</td>
-                                            <td>{{$projetAA -> updated_at}}</td>
-                                            <td>{{$projetAA -> dateSouscription}}</td>
-                                            <td>{{$projetAA -> dateEffet}}</td>
-                                            <td>{{$projetAA -> commentaire}}</td>
+                                            <td>{{$projetAA->client->nom}} {{$projetAA->client->prenom}}</td>
+                                            <td>{{$projetAA->type}}</td>
+                                            <td>{{$projetAA->origine}}</td>
+                                            <td>{{$projetAA->user->nom}} {{$projetAA->user->prenom}}</td>
+                                            <td>{{$projetAA->projetPrioritaire}}</td>
+                                            <td>{{$projetAA->statut}}</td>
+                                            <td>{{$projetAA->created_at}}</td>
+                                            <td>{{$projetAA->updated_at}}</td>
+                                            <td>{{$projetAA->dateSouscription}}</td>
+                                            <td>{{$projetAA->dateEffet}}</td>
+                                            <td>{{$projetAA->commentaire}}</td>
                                             <td>
                                                 <div style="text-align: center">
                                                   

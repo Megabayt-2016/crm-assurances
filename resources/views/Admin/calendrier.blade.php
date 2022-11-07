@@ -11,7 +11,7 @@
 
     <title>Calendrier | Carrez Conseil Assurances</title>
 
-    <link href="{{('../css/sb-admin-2.min.css')}}" rel="stylesheet">
+    <link href="{{('../css/sb-admin-2.min.css')}}" rel="stylesheet">    
 	  <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	  <link rel="stylesheet" href="{{('../css/tailwind.min.css')}}">
@@ -32,7 +32,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
 <!-- Sidebar - Brand -->
-<a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url('/Admin/index')}}">
+<a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url('/dashboard')}}">
     <div class="sidebar-brand-icon ">
       <i>
          <img src="{{asset('../img/CCA-removebg-preview.png')}}" style="margin-top: 15%; width:65%; margin-left:15%"/>
@@ -45,7 +45,7 @@
 
 <!-- Nav Item - Dashboard -->
 <li class="nav-item active">
-    <a class="nav-link" href="{{url('/Admin/index')}}">
+    <a class="nav-link" href="{{url('/dashboard')}}">
         <i class="fas fa-fw fa-tachometer-alt"></i>
         <span>Dashboard</span></a>
 </li>
@@ -72,7 +72,7 @@
     <div id="collapseProjet" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
        <div class="bg-white py-2 collapse-inner rounded">
           <h6 class="collapse-header">Custom Components:</h6>
-          <a class="collapse-item" href="{{url('/Admin/assurancePersonne')}}">Assurance Personnes</a>
+          <a class="collapse-item" href="{{url('/projets')}}">Assurance Personnes</a>
           <a class="collapse-item" href="{{url('/Admin/assuranceAnimaux')}}">Assurance Animaux</a>
           <a class="collapse-item" href="{{url('/Admin/emprunteur')}}">Emprunteurs</a>
        </div>
@@ -129,7 +129,7 @@
     <div id="collapselisteProjet" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">liste des projets:</h6>
-            <a class="collapse-item" href="{{url('/Admin/listeProjetAP')}}">Assurance Personnes</a>
+            <a class="collapse-item" href="{{url('/projects')}}">Assurance Personnes</a>
             <a class="collapse-item" href="{{url('/Admin/listeProjetAA')}}">Assurance Animaux</a>
             <a class="collapse-item" href="{{url('/Admin/listeProjetE')}}">Emprunteurs</a>
         </div>
